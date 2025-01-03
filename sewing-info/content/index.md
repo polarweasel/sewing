@@ -1,10 +1,8 @@
-+++
-date = '2025-01-02T22:35:31-08:00'
-draft = false
-title = 'Polarweasel: Heavy-Duty Sewing'
-+++
-
-**Note: I am not currently accepting any sewing work. Thanks for your interest.**
+---
+date: 2025-01-02T22:35:31-08:00
+draft: false
+title: 'Polarweasel: Heavy-Duty Sewing'
+---
 
 Polarweasel Gear was my custom sewn-goods company. I made and repaired fire and EMS gear, bags, laptop cases, dog accessories, and more.
 

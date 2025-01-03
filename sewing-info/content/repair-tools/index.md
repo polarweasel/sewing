@@ -1,8 +1,8 @@
-+++
-date = '2025-01-02T22:18:15-08:00'
-draft = true
-title = 'Tools for sewing-machine repair'
-+++
+---
+date: 2025-01-02T22:18:15-08:00
+draft: true
+title: Tools for sewing-machine repair
+---
 
 ## Screwdrivers
 
