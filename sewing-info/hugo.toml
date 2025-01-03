@@ -2,6 +2,7 @@ baseURL = 'https://polarweasel.org/gear/'
 languageCode = 'en-ca'
 title = "Polarweasel's sewing stuff"
 theme = ["github.com/theNewDynamic/gohugo-theme-ananke/v2"]
+# theme = [""]
 
 resourceDir = "../resources"
 
@@ -34,8 +35,10 @@ priority = 0.5
 filename = "sitemap.xml"
 
 [params]
+# These parameters were set by the Ananke theme
+
 text_color = ""
-author = ""
+author = "Teh Polarweasel"
 favicon = ""
 site_logo = ""
 description = "The last theme you'll ever need. Maybe."
@@ -55,6 +58,7 @@ networks = [
 ]
 
 [params.ananke.social.follow]
+new_window_icon = false # show a little "opens in new window" icon next to the link
 networks = [
   "mastodon",
   "github",
