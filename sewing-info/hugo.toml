@@ -1,4 +1,4 @@
 baseURL = 'https://polarweasel.org/gear/'
 languageCode = 'en-ca'
 title = "Polarweasel's sewing stuff"
-theme = 'ananke'
+theme = ["github.com/theNewDynamic/gohugo-theme-ananke/v2"]
