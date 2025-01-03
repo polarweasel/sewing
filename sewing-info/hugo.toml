@@ -57,6 +57,7 @@ networks = [
 [params.ananke.social.follow]
 networks = [
   "mastodon",
+  "github",
   "linkedin"
 ]
 
@@ -67,3 +68,6 @@ profilelink = "https://hachyderm.io/@polarweasel#."
 [params.ananke.social.linkedin]
 username = "polarweasel"
 profilelink = "https://linkedin.com/in/polarweasel"
+
+[params.ananke.social.github]
+username = "polarweasel"
