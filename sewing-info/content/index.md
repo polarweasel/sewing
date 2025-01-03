@@ -2,6 +2,7 @@
 date: 2025-01-02T22:35:31-08:00
 draft: false
 title: 'Polarweasel: Heavy-Duty Sewing'
+featured_image: /images/gohugo-default-sample-hero-image.jpg
 ---
 
 Polarweasel Gear was my custom sewn-goods company. I made and repaired fire and EMS gear, bags, laptop cases, dog accessories, and more.
