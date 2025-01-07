@@ -1,6 +1,6 @@
 # sewing
 
-Eventually, this repo will feed the sewing content for [polarweasel.org](https://polarweasel.org/gear/) using a static site generator (probably [Hugo](https://gohugo.io)).
+This repo generates (or rather, is about to) the main site at [polarweasel.org](https://polarweasel.org/) using a static site generator ([Hugo](https://gohugo.io)).
 
 ## License
 

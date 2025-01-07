@@ -1,7 +1,7 @@
 ---
-date: 2025-01-02T22:18:15-08:00
 title: Tools for sewing-machine repair
-draft: true
+type: default
+draft: false
 ---
 
 This page is a stab at a tool list to get you started repairing sewing machines&mdash;maybe just yours, and maybe also other people's. This list is not exhaustive, but I'll continue to add tools as I think of them, or as readers suggest them.
