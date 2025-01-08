@@ -27,8 +27,10 @@ jobs:
       - name: 🛠️ Build
         run: hugo -s sewing-info/
       - name: 🔐 Create Key File
-        run: install -m 600 -D /dev/null ~/.ssh/id_ed25519
+        run: install -m 600 -D /dev/null ~/.ssh/id_rsa
+      - name: 🔐 Load Host Keys
+        run: echo "${{ secrets.KNOWN_HOSTS }}" > ~/.ssh/known_hosts
       - name: 🔑 Populate Key
-        run: echo "${{ secrets.LIMITED_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+        run: echo "${{ secrets.LIMITED_PRIVATE_KEY }}" > ~/.ssh/id_rsa
       - name: 🚀 Upload
         run: rsync -avz --delete sewing-info/public/ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ secrets.SSH_PATH }}
