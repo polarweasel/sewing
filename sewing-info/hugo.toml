@@ -1,7 +1,6 @@
 baseURL = 'https://polarweasel.org/new-site/'
 languageCode = 'en-ca'
 title = "Alex Ball"
-# theme = ["github.com/theNewDynamic/gohugo-theme-ananke/v2"]
 theme = ["github.com/McShelby/hugo-theme-relearn"]
 
 defaultContentLanguage = "en"
