@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   push:
     paths:
-      - "sewing-info/content/**"
+      - "sewing-info/**"
     branches:
       - hugo-setup
 
