@@ -1,0 +1,34 @@
+name: Website
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "sewing-info/content/**"
+    branches:
+      - hugo-setup
+
+jobs:
+  deploy:
+    name: Build and Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🛒 Checkout
+        uses: actions/checkout@latest
+      - name: ✨ Install Hugo
+        env:
+          HUGO_VERSION: 0.140.2
+        run: |
+          mkdir ~/hugo
+          cd ~/hugo
+          curl -L "https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/hugo_${HUGO_VERSION}_Linux-64bit.tar.gz" --output hugo.tar.gz
+          tar -xvzf hugo.tar.gz
+          sudo mv hugo /usr/local/bin
+      - name: 🛠️ Build
+        run: hugo -s sewing-info/
+      - name: 🔐 Create Key File
+        run: install -m 600 -D /dev/null ~/.ssh/id_ed25519
+      - name: 🔑 Populate Key
+        run: echo "${{ secrets.LIMITED_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+      - name: 🚀 Upload
+        run: rsync -avz --delete sewing-info/public/ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ secrets.SSH_PATH }}
