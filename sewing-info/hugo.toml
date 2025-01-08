@@ -10,7 +10,7 @@ enableRobotsTXT = true
 ignoreLogs = ['warning-goldmark-raw-html']
 
 [sitemap]
-changefreq = "monthly"
+changefreq = "weekly"
 priority = 0.5
 filename = "sitemap.xml"
 

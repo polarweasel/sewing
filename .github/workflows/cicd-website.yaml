@@ -2,6 +2,15 @@ name: Website
 
 on:
   workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch to deploy'
+        required: true
+        default: 'hugo-setup'
+        type: choice
+        options:
+          - 'hugo-setup'
+          - 'main'
   push:
     paths:
       - "sewing-info/**"
