@@ -1,3 +1,5 @@
+[![Website](https://github.com/polarweasel/sewing/actions/workflows/cicd-website.yaml/badge.svg?branch=hugo-setup)](https://github.com/polarweasel/sewing/actions/workflows/cicd-website.yaml)
+
 # sewing
 
 Eventually, this repo will feed the sewing content for [polarweasel.org](https://polarweasel.org/gear/) using a static site generator (probably [Hugo](https://gohugo.io)).
