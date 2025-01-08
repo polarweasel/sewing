@@ -1,4 +1,4 @@
-baseURL = 'https://polarweasel.org/'
+baseURL = 'https://polarweasel.org/new-site/'
 languageCode = 'en-ca'
 title = "Alex Ball"
 # theme = ["github.com/theNewDynamic/gohugo-theme-ananke/v2"]
