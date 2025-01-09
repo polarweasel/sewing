@@ -5,7 +5,7 @@ on:
     paths:
       - "sewing-info/**"
     branches:
-      - hugo-setup
+      - main
 
   workflow_dispatch:
 
