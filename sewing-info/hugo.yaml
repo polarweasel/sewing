@@ -1,4 +1,4 @@
-baseURL: 'https://polarweasel.org/new-site/'
+baseURL: 'https://polarweasel.org/'
 languageCode: 'en-ca'
 title: "Alex Ball"
 theme:
