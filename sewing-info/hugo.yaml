@@ -1,0 +1,39 @@
+baseURL: 'https://polarweasel.org/new-site/'
+languageCode: 'en-ca'
+title: "Alex Ball"
+theme:
+  - "github.com/McShelby/hugo-theme-relearn"
+
+defaultContentLanguage: "en"
+sectionPagesMenu: "main"
+enableRobotsTXT: true
+ignoreLogs:
+  - 'warning-goldmark-raw-html'
+
+sitemap:
+  changefreq: "weekly"
+  priority: 0.5
+  filename: "sitemap.xml"
+
+params:
+  themeVariant:
+    - identifier: 'neon'
+      name: 'Theme: Neon'
+    - auto:
+        - 'zen-light'
+        - 'zen-dark'
+      identifier: 'zen-auto'
+      name: 'Theme: Zen (auto light/dark)'
+    - identifier: 'zen-light'
+      name: 'Theme: Zen (light)'
+    - identifier: 'zen-dark'
+      name: 'Theme: Zen (dark)'
+
+author:
+  name: "Alex Ball"
+
+#collapsibleMenu: true
+  # See here for a performance warning on collapsible menus:
+  # https://mcshelby.github.io/hugo-theme-relearn/configuration/sidebar/menus/index.html#expander-for-submenus
+
+#editURL: 'https://github.com/polarweasel/sewing/edit/hugo-setup/sewing-info/content/${FilePath}'
