@@ -1,4 +1,4 @@
-name: Website
+name: Build & Deploy
 
 on:
   push:
@@ -17,12 +17,12 @@ jobs:
       - name: 🛒 Checkout
         uses: actions/checkout@v4
       - name: ✨ Install Hugo
-        env:
-          HUGO_VERSION: 0.140.2
+        # env:
+        #   HUGO_VERSION: 0.140.2
         run: |
           mkdir ~/hugo
           cd ~/hugo
-          curl -L "https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/hugo_${HUGO_VERSION}_Linux-64bit.tar.gz" --output hugo.tar.gz
+          curl -L "https://github.com/gohugoio/hugo/releases/download/v${{ vars.HUGO_VERSION }}/hugo_${{ vars.HUGO_VERSION }}_Linux-64bit.tar.gz" --output hugo.tar.gz
           tar -xvzf hugo.tar.gz
           sudo mv hugo /usr/local/bin
       - name: 🛠️ Build
