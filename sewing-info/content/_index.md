@@ -4,7 +4,7 @@ draft: false
 title: 'Writing and Sewing'
 featured_image: /images/gohugo-default-sample-hero-image.jpg
 cascade:
-  editURL: 'https://github.com/polarweasel/sewing/edit/hugo-setup/sewing-info/content/${FilePath}'
+  editURL: 'https://github.com/polarweasel/sewing/edit/main/sewing-info/content/${FilePath}'
   collapsibleMenu: true
 ---
 
