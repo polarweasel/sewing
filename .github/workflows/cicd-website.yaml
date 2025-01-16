@@ -27,6 +27,7 @@ jobs:
         run: hugo -s sewing-info/
       - name: 🔐 Create .htpasswd
         run: |
+          htpasswd -b -c sewing-info/public/portfolio/temp.txt user pass
           echo -n '${{ secrets.PORTFOLIO_USER }}:${{ secrets.PORTFOLIO_HTPASSWD }}' > sewing-info/public/portfolio/.htpasswd
       - name: 🔐 Create Key File
         run: install -m 600 -D /dev/null ~/.ssh/id_rsa
