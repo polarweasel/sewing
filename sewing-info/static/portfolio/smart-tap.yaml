@@ -1,0 +1,673 @@
+openapi: 3.0.1
+info:
+  title: Smart Tap API
+  version: WIP 0.1
+  description: |
+    CableLabs Smart Tap APIs. This is a companion document to the `WR-SP-SMART-TAPS-*` specification.
+    
+    For more information, contact Joey Padden.
+
+    **NOTE** Use of this API specification is governed by the terms of the license contained in the `.license` file accompanying the specification.
+ 
+  contact:
+    name: Alex Ball
+    email: awball@polarweasel.org
+    url: 'https://www.cablelabs.com/specs/'
+
+  license:
+    name: (c) 2018 CableLabs - distribution is permitted; see `.license` file that accompanies this specification.
+    url: 'https://github.com/cablelabs/smart-tap/blob/master/.license'
+
+tags:
+  - name: Single-tap
+    description: Operations affecting one tap at a time.
+  - name: Global
+    description: Operations affecting all taps. Also known as broadcast operations.
+  - name: Management
+    description: Operations for managing taps, either singly or in bulk.
+  - name: Deprecated
+    description: (We might want to have some kinda **deprecation policy** here...)
+paths:
+  /devices:
+    get:
+      tags:
+        - Management
+      summary: List all devices
+      description: |
+        Returns all devices, with optional pagination. You can also use the `deviceIds` query parameter to return only the specified devices.
+        
+        **Notes:**
+
+        - Returns the first 100 devices if you omit the `numItems` and `bookmark` parameters.
+        
+        - Returns an empty array if there are no devices.
+      parameters:
+        - $ref: '#/components/parameters/bookmarkParam'
+        - $ref: '#/components/parameters/numItemsParam'
+        - $ref: '#/components/parameters/deviceIdsParam'
+      responses:
+        '200':
+          description: Device list returned successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DevicesPaginatedResponse'
+        '400':
+          description: Bad request. One or more parameters is invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /devices/status:
+    get:
+      tags:
+        - Management
+      summary: Request status of multiple (or all) taps
+      description: |
+        Requests the status of all devices. Optionally, you can specify a list of devices to query.
+        
+        **Notes:**
+
+        - This is a callback function. The relay server will concatenate the status of the specified devices, and POST a JSON array to `callbackUrl`, using the endpoint defined in the `callbacks:` section.
+
+        - To query only a specific set of devices, specify their IDs in the `deviceIds` query parameter. This option is limited to 50 devices.
+      parameters:
+        - name: callbackUrl
+          in: query
+          required: true
+          description: |
+            The location where data will be sent. Must be network accessible from the relay server.
+          schema:
+            type: string
+            format: uri
+            example: https://tca-app-location/device-status
+        - $ref: '#/components/parameters/deviceIdsParam'
+      responses:
+        '201':
+          description: Device status request accepted. When it has gathered the requested statuses, the relay server will call the callback function.
+        '400':
+          description: Bad request. One or more parameters is invalid, or more than 50 device IDs specified.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      callbacks:
+        onData:
+          # The relay server will send data to the `callbackUrl` provided
+          # when making the subscription PLUS the suffix `/data`
+          '{$request.query.callbackUrl}/data':
+            post:
+              description: The relay server calls this function to return the requested device statuses.
+              requestBody:
+                description: Device status payload
+                content:
+                  application/json:
+                    schema:
+                      $ref: '#/components/schemas/DeviceStatusResponse'
+                required: true
+              responses:
+                '204':
+                  description: No data. Device status successfully received.
+
+  /devices/queue:
+    get:
+    # TODO: is this going to be of any use? Or should it be replaced by /devices/status
+      tags:
+        - Global
+        - Management
+      summary: List global queue
+      description: Retrieves the contents of the global message queue.
+      responses:
+        '200':
+          description: Queue list returned successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QueueItems'
+    post:
+      tags:
+        - Global
+        - Management
+      summary: Submit a global operation
+      description: |
+        Adds a message to the global message queue. You can specify up to 50 devices in the `deviceIds` query parameter, or omit `deviceIds` to send to all devices.
+      parameters:
+        - $ref: '#/components/parameters/deviceIdsParam'
+      requestBody:
+        description: Tap-control operation
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TapOperation'
+        required: true
+      responses:
+        '201':
+          description: |
+            Created. Message submitted to the global queue. Queue ID is contained in the response object.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TapOperation'
+        '400':
+          description: Bad request. Malformed message, or operation type not permitted.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+    # TODO: if we remove the GET on this endpoint, also get rid of this DELETE
+      tags:
+        - Global
+        - Management
+      summary: Clear global queue
+      description: |
+        Removes all entries from the global operations queue.
+
+        **Note** This clears only the _global_ queue; it does not clear each device's individual queue.
+      responses:
+        '204':
+          description: No content. Global queue successfully cleared (or was empty in the first place).
+
+  '/devices/{deviceId}':
+    get:
+      tags:
+        - Single-tap
+        - Management
+      summary: Get device
+      description: Retrieves information about the given device.
+      parameters:
+        - in: path
+          name: deviceId
+          description: ID of the device to query.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Device information returned successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Device'
+        '404':
+          description: Not found. Specified device ID is invalid or does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      tags:
+        - Single-tap
+        - Management
+      summary: Create device
+      description: |
+        Creates a device with the specified ID.
+
+        **NOTE** To update a device, use `PATCH /devices/{deviceId}`.
+      parameters:
+        - in: path
+          name: deviceId
+          description: ID of the device to create/update.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Device'
+        description: The device object to create
+        required: true
+      responses:
+        '201':
+          description: Created. Device created successfully.
+        '400':
+          description: |
+            Bad request. One or more properties of the request object is invalid, or the device already exists.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    patch:
+      tags:
+        - Single-tap
+        - Management
+      summary: Update device
+      description: >-
+        Updates the specified device. This operation updates only the fields you
+        specify; all others remain unchanged.
+      parameters:
+        - in: path
+          name: deviceId
+          description: ID of the device to update.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DevicePatch'
+        description: The device object to update. Include only the fields you wish to update.
+        required: true
+      responses:
+        '204':
+          description: No content. Device updated successfully.
+        '400':
+          description: Bad request. One or more properties of the request object is invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found. The specified device EUI is invalid or does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      tags:
+        - Single-tap
+        - Management
+      summary: Delete device
+      description: Deletes the specified device.
+      parameters:
+        - in: path
+          name: deviceId
+          description: ID of the device to delete.
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: No content. Specified device successfully deleted (or did not exist in the first place).
+
+  '/devices/{deviceId}/queue':
+    get:
+      tags:
+        - Single-tap
+        - Management
+      summary: Get device queue
+      description: Returns the specified device's message queue. Queue items are responses to messages you have sent to the device with the `POST /devices/{deviceId}/queue` method.
+      parameters:
+        - in: path
+          name: deviceId
+          description: ID of the device to query.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Queue list returned successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QueueItems'
+        '404':
+          description: Not found. Specified device does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      tags:
+        - Single-tap
+        - Management
+      summary: Add queued message
+      description: Adds a message to the specified device's message queue.
+      parameters:
+        - in: path
+          name: deviceId
+          description: ID of the target device
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TapOperation'
+        description: The message to be sent to the tap. Omit the device EUI.
+        required: true
+      responses:
+        '200':
+          description: Device operation queued successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TapOperation'
+        '400':
+          description: Bad request. One or more properties of the request object is invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found. The specified device ID does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '418':
+          description: I am a teapot. The specified device does not support Smart Tap functionality.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      tags:
+        - Single-tap
+        - Management
+      summary: Clear device queue
+      description: Deletes the message queue for the specified device.
+      parameters:
+        - in: path
+          name: deviceId
+          description: ID of the target device
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: No content. Device queue successfully cleared (or was empty in the first place).
+        '404':
+          description: Not found. Specified device does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  '/devices/{deviceId}/queue/{itemId}':
+    get:
+      tags:
+        - Single-tap
+        - Management
+      summary: Get device queue item
+      description: |
+        Retrieves the device's response, if any, to the specified operation.
+        
+        When you submit a message with the `POST /devices/{deviceId}/queue` operation, use this GET to retrieve the device's response.
+        
+        After the operation completes, the queue item is available in the queue for a minimum of 60 minutes. Optionally, you can also clear the item with the `DELETE` operation.
+      parameters:
+        - in: path
+          name: deviceId
+          description: ID of the device to query.
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: itemId
+          description: ID of the queue item to query.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Queue item returned successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceResponse'
+        '204':
+          description: No response received from the device yet.
+        '400':
+          description: Bad request. Invalid device or item ID.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found. Either the specified device ID or queue item ID does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      tags:
+        - Single-tap
+        - Management
+      summary: Delete device queue item
+      description: Removes the specified device queue item. If the device has not yet finished replying, any further replies from the device will be silently discarded.
+      parameters:
+        - in: path
+          name: deviceId
+          description: ID of the device whose queue we are modifying
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: itemId
+          description: ID of the queue item to remove.
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: No content. Specified queue item successfully cleared (or did not exist in the first place).
+        '400':
+          description: Bad request. Invalid device or item ID.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Not found. The specified device ID does not exist.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+servers:
+  - url: 'https://smart-tap.cablelabs.com/'
+
+components:
+  parameters:
+    bookmarkParam:
+      name: bookmark
+      in: query
+      description: |
+        Used to resume at a specific point when paging through a large result set. This value is returned by the API.
+
+        **Notes:**
+        
+        * This token is an opaque key that clients should not interpret. A consumer should pass back the token it received on the subsequent call.
+
+        * Must be used in conjunction with `numItems` to indicate page size.
+        
+        * The last page of results does not include a bookmark.
+      required: false
+      schema:
+        type: string
+    numItemsParam:
+      name: numItems
+      in: query
+      description: The maximum number of items to return. Must be greater than zero. If not specified, the default is 100.
+      required: false
+      schema:
+        type: integer
+    deviceIdsParam:
+      # specify multiple device IDs in a query parameter like this:
+      # GET /end/point/name?deviceIds=1000,2000,3000,4000...
+      name: deviceIds
+      in: query
+      description: The device IDs to query. Omit to query all devices. Maximum 50 device IDs.
+      required: false
+      style: form
+      explode: false
+      schema:
+        type: array
+        items:
+          type: string
+        maxItems: 50
+
+  schemas:
+    Bookmark:
+      title: Bookmark
+      type: string
+      example: bkmk0015
+      description: An opaque continuation token to be passed back with a GET query to retrieve the next set of results. Null if all results have been returned.
+    Device:
+      title: Device
+      type: object
+      description: A Smart Tap device.
+      properties:
+        deviceId:
+          $ref: '#/components/schemas/DeviceId'
+        deviceType:
+          type: string
+          enum:
+            - lora
+            - ip
+          description: Type of the device (LoRa or TCP/IP).
+        deviceCapabilityProfile:
+          type: string
+          description: >-
+            Capability profile, such as "2portTap", "4portTap", "inlineSwitch",
+            and so on.
+        displayName:
+          type: string
+          description: Optional display name for the device.
+      required:
+        - deviceId
+        - deviceType
+        - deviceCapabilityProfile
+      example:
+        deviceId: '64:a5:c3:00:00:5c:da:55'
+        deviceType: ip
+        deviceCapabilityProfile: 2portTap
+        displayName: Alex's MacBook
+    DeviceId:
+      title: DeviceId
+      type: string
+      description: Unique 64-bit identifier for a device. Must be globally unique. For LoRa devices, this is the EUI-64. For 3GPP devices, this is the IMEI. For other device types, select an appropriate identifier.
+    DevicePatch:
+      title: DevicePatch
+      type: object
+      description: 'Update information for a Smart Tap device, used by a PATCH operation.'
+      properties:
+        deviceId:
+          $ref: '#/components/schemas/DeviceId'
+        deviceType:
+          type: string
+          enum:
+            - lora
+            - ip
+          description: Type of the device (LoRa or TCP/IP).
+        deviceCapabilityProfile:
+          type: string
+          description: >-
+            Capability profile, such as "2portTap", "4portTap", "inlineSwitch",
+            and so on.
+        displayName:
+          type: string
+          description: Optional display name for the device.
+      example:
+        deviceCapabilityProfile: inlineSwitch
+        displayName: Alex's Updated MacBook
+    DeviceResponse:
+      title: DeviceResponse
+      type: object
+      description: A device ID and corresponding status.
+      properties:
+        operation:
+          $ref: '#/components/schemas/TapOperation'
+        deviceResponse:
+          type: string
+          description: device status
+          example: '0x1FF'
+      required: [deviceResponse]
+    DevicesPaginatedResponse:
+      title: DevicesPaginatedResponse
+      type: object
+      description: A paginated list of devices. Contains a bookmark and an array of Device objects.
+      properties:
+        bookmark:
+          $ref: '#/components/schemas/Bookmark'
+        devices:
+          type: array
+          description: List of devices. Empty if no devices.
+          items:
+            $ref: '#/components/schemas/Device'
+      required:
+        - devices
+      example:
+        bookmark: marker57
+        devices:
+          - deviceType: ip
+            deviceId: '64:a5:c3:00:00:5c:da:55'
+            displayName: Alex's MacBook
+            deviceCapabilityProfile: 2portTap
+          - deviceType: lora
+            deviceId: '46:5a:3c:00:00:c5:ad:55'
+            displayName: SmartTap 5000
+            deviceCapabilityProfile: 6portTap
+    DeviceStatus:
+      title: DeviceStatus
+      type: object
+      description: A device ID and corresponding status.
+      properties:
+        deviceId:
+          $ref: '#/components/schemas/DeviceId'
+        deviceStatus:
+          type: string
+          description: device status
+    DeviceStatusResponse:
+      title: DeviceStatusResponse
+      type: object
+      description: An array of device IDs and their statuses.
+      properties:
+        deviceStatuses:
+          type: array
+          description: List of devices. Empty if no devices.
+          items:
+            $ref: '#/components/schemas/DeviceStatus'
+      required:
+        - deviceStatuses
+    ErrorResponse:
+      title: ErrorResponse
+      type: object
+      description: Contains information about HTTP return and error codes.
+      properties:
+        code:
+          type: string
+          example: ServiceNotFound
+          description: Textual error code (such as 'ServiceNotFound' or '404') allowing a calling system to make a decision about how to handle the error.
+        message:
+          type: string
+          example: Service not found.
+          description: A human-readable description of the error condition. This is not localized, and is intended to support API client developers; **not for display to an end user.**
+      required:
+        - code
+        - message
+    QueueItems:
+      title: QueueItems
+      type: object
+      description: A paginated list of queued operations. Contains a bookmark and an array of QueueItem objects.
+      properties:
+        bookmark:
+          $ref: '#/components/schemas/Bookmark'
+        queueItems:
+          type: array
+          description: List of queued operations. Empty if no queued operations.
+          items:
+            $ref: '#/components/schemas/TapOperation'
+      required:
+        - queueItems
+    TapOperation:
+      title: TapOperation
+      type: object
+      description: A queued operation.
+      properties:
+        message:
+          type: string
+          description: Message to be sent to the device. For example, `0x0101` pings the device.
+        queueItemId:
+          type: string
+          description: server-assigned ID for queued items.
+      required:
+        - message
+      example:
+        message: '0x0101'
+        queueItemId: '2a7c631f-2818-43c5-9479-e29042f0f034'

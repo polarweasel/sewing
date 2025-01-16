@@ -25,6 +25,8 @@ jobs:
           sudo mv hugo /usr/local/bin
       - name: 🛠️ Build
         run: hugo -s sewing-info/
+      - name: 🔐 Create .htpasswd
+        run: echo "${{ secrets.PORTFOLIO_USER }}:${{ secrets.PORTFOLIO_HTPASSWD }}" > sewing-info/public/portfolio/.htpasswd
       - name: 🔐 Create Key File
         run: install -m 600 -D /dev/null ~/.ssh/id_rsa
       - name: 🔐 Load Host Keys
