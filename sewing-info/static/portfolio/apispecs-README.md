@@ -10,10 +10,8 @@ For C# development, we may want to look at [NSwag](https://github.com/NSwag/NSwa
 
 Clone or copy this repository so you can run things locally.
 
-To begin creating a spec of your own, start with the [spec template](api-specs/full-swagger-spec-template.yaml).
-Copy the contents into the [online Swagger Editor](http://editor.swagger.io/) and explore how it's put together.
-Once you have a sense of how things work, and you've familiarized yourself with what's already in the APIs
-(use the web interface to do that, and explore the [directory structure](#directory-structure) and [fragment structure](#fragment-structure)).
+To begin creating a spec of your own, start with the [spec template](api-specs/full-swagger-spec-template.yaml). Copy the contents into the [online Swagger Editor](http://editor.swagger.io/) and explore how it's put together. Once you have a sense of how things work, and you've familiarized yourself with what's already in the APIs (use the web interface to do that), explore the [directory structure](#directory-structure) and [fragment structure](#fragment-structure).
+
 Once you've created a valid spec, break out the paths (and object definitions and parameters, as necessary), and [submit your merge request](http://thor.mr.ericsson.se/ealxbal/api-spec-testing/merge_requests).
 
 Refer to the [OpenAPI spec itself](http://swagger.io/specification/) as you're writing your API definitions; it's quite usefully-written, in most cases.
@@ -30,11 +28,11 @@ Refer to the [OpenAPI spec itself](http://swagger.io/specification/) as you're w
 
 Clone (or copy) this repository. Then in bash, do this:
 
-    $ cd build
-
-    $ ./build-everything
-
-    $ http-server ../site
+```bash
+cd build
+./build-everything
+http-server ../site
+```
 
 Open a web browser and point it to your machine at [127.0.0.1:8080](http://127.0.0.1:8080/). That will show you the current documentation.
 
