@@ -12,7 +12,7 @@ Clone or copy this repository so you can run things locally.
 
 To begin creating a spec of your own, start with the [spec template](api-specs/full-swagger-spec-template.yaml). Copy the contents into the [online Swagger Editor](http://editor.swagger.io/) and explore how it's put together. Once you have a sense of how things work, and you've familiarized yourself with what's already in the APIs (use the web interface to do that), explore the [directory structure](#directory-structure) and [fragment structure](#fragment-structure).
 
-Once you've created a valid spec, break out the paths (and object definitions and parameters, as necessary), and [submit your merge request](http://thor.mr.ericsson.se/ealxbal/api-spec-testing/merge_requests).
+Once you've created a valid spec, break out the paths (and object definitions and parameters, as necessary), and [submit your merge request](http://example.com/ealxbal/api-spec-testing/merge_requests).
 
 Refer to the [OpenAPI spec itself](http://swagger.io/specification/) as you're writing your API definitions; it's quite usefully-written, in most cases.
 
